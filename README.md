@@ -12,19 +12,20 @@
 
 ### Общая схема
 
-```
+```text
                     ┌──────────────────┐
-execute(task) ──▶ │   Distributor    │──▶ Queue #0 ──▶ Worker-1
-│  (RoundRobin /   │──▶ Queue #1 ──▶ Worker-2
-│   LeastLoaded)   │──▶ Queue #2 ──▶ Worker-3
-└───────┬──────────┘      ...
-│
-(все очереди полны?)
-│
-┌───────▼──────────┐
-│    Rejection     │
-│     Policy       │
-└──────────────────┘
+execute(task) ──▶   │   Distributor    │──▶ Queue #0 ──▶ Worker-1
+  │ (RoundRobin /   │──▶ Queue #1 ──▶ Worker-2
+  │  LeastLoaded)   │──▶ Queue #2 ──▶ Worker-3
+  └───────┬─────────┘      ...
+          │
+  (все очереди полны?)
+          │
+  ┌───────▼──────────┐
+  │    Rejection     │
+  │     Policy       │
+  └──────────────────┘
+
 ```
 
 Каждый воркер имеет **собственную** `ArrayBlockingQueue`. Это устраняет contention
