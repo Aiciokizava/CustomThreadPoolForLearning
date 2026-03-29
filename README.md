@@ -12,20 +12,22 @@
 
 ### Общая схема
 
-```text
-                     +------------------+
-execute(task) ---->  |   Distributor    |----> Queue #0 ----> Worker-1
-  | (RoundRobin /    |----> Queue #1 ----> Worker-2
-  |  LeastLoaded)    |----> Queue #2 ----> Worker-3
-  +-------+----------+      ...
-          |
-  (все очереди полны?)
-          |
-  +-------v----------+
-  |    Rejection     |
-  |     Policy       |
-  +------------------+
+```mermaid
+graph TD
+    subgraph Pool [Custom Thread Pool]
+    A[execute task] --> B{Distributor}
+    
+    B -- RoundRobin / LeastLoaded --> Q0[Queue #0] --> W0[Worker-1]
+    B --> Q1[Queue #1] --> W1[Worker-2]
+    B --> Q2[Queue #2] --> W2[Worker-3]
+    
+    A --> C{All Queues Full?}
+    C -- Yes --> RP[Rejection Policy]
+    RP --> CR[Caller Runs / Abort]
+    end
 
+    style B fill:#f9f,stroke:#333,stroke-width:2px
+    style RP fill:#f66,stroke:#333,stroke-width:2px
 ```
 
 Каждый воркер имеет **собственную** `ArrayBlockingQueue`. Это устраняет contention
